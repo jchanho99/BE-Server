@@ -41,7 +41,7 @@ jobs:
             # Gradle 실행 권한 추가
             chmod +x ./gradlew
 
-                        # MariaDB 설치
+            # MariaDB 설치
             sudo apt update
             sudo apt install -y mariadb-server mariadb-client
             
@@ -54,11 +54,13 @@ jobs:
             sudo mariadb -u root -p'ktbgroom' -e "CREATE DATABASE IF NOT EXISTS writeagain;"
             
             # 테이블 생성
-            sudo mariadb -u root -p'ktbgroom' -e "USE writeagain; CREATE TABLE IF NOT EXISTS users (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              username VARCHAR(255) NOT NULL UNIQUE,
-              blog_type ENUM('velog', 'github', 'blog', 'tistory') NOT NULL
-            );"
+              sudo mariadb -u root -p'ktbgroom' -e "USE writeagain; 
+              CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL UNIQUE,
+                blog_type ENUM('velog', 'github', 'blog', 'tistory') NOT NULL
+              );"
+
 
             # 환경 변수 설정 (MariaDB용 URL로 변경)
             echo 'export SPRING_DATASOURCE_URL=jdbc:mariadb://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false' >> ~/.bashrc

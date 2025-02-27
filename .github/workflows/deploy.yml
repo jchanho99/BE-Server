@@ -28,7 +28,7 @@ jobs:
             cd BE-Server || git clone https://github.com/WriteAgain/BE-Server.git && cd BE-Server
             git pull origin main
             
-            # Java 설치 (버전 21)
+            # Java 21 설치
             sudo apt update
             sudo apt install -y openjdk-21-jdk
             export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
@@ -39,16 +39,23 @@ jobs:
             
             # Gradle 실행 권한 추가
             chmod +x ./gradlew
-            
-            # MySQL 확인 및 설정
+
+            # MySQL 8.4.4 ARM 버전 설치 및 설정
+            sudo apt install -y mysql-server
             sudo systemctl start mysql
+            sudo systemctl enable mysql
             mysql -u root -e 'CREATE DATABASE IF NOT EXISTS writeagain;'
-            
+            mysql -u root -e \"CREATE TABLE IF NOT EXISTS writeagain.users (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              username VARCHAR(255) NOT NULL UNIQUE,
+              blog_type ENUM('velog', 'github', 'blog', 'tistory') NOT NULL
+            );\"
+
             # 환경 변수 설정 (GCP MySQL 및 AI 서버 IP 적용)
-            echo 'SPRING_DATASOURCE_URL=jdbc:mysql://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true' >> ~/.bashrc
-            echo 'SPRING_DATASOURCE_USERNAME=root' >> ~/.bashrc
-            echo 'SPRING_DATASOURCE_PASSWORD=ktbgroom' >> ~/.bashrc
-            echo 'AI_SERVER_URL=http://35.216.2.205' >> ~/.bashrc
+            echo 'export SPRING_DATASOURCE_URL=jdbc:mysql://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true' >> ~/.bashrc
+            echo 'export SPRING_DATASOURCE_USERNAME=root' >> ~/.bashrc
+            echo 'export SPRING_DATASOURCE_PASSWORD=ktbgroom' >> ~/.bashrc
+            echo 'export AI_SERVER_URL=http://35.216.2.205' >> ~/.bashrc
             source ~/.bashrc
 
             # 백엔드 실행

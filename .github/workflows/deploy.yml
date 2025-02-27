@@ -1,0 +1,30 @@
+name: Deploy to Existing Compute Engine VM
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 푸시될 때 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Deploy to Compute Engine
+        run: |
+          gcloud compute ssh instance-20250227-030817 --zone=asia-northeast3-a --command="
+            cd BE-Server || git clone https://github.com/WriteAgain/BE-Server.git && cd BE-Server
+            git pull origin main
+            ./gradlew bootRun  # Backend 실행 명령어
+          "

@@ -44,6 +44,13 @@ jobs:
             sudo systemctl start mysql
             mysql -u root -e 'CREATE DATABASE IF NOT EXISTS writeagain;'
             
+            # 환경 변수 설정 (GCP MySQL 및 AI 서버 IP 적용)
+            echo 'SPRING_DATASOURCE_URL=jdbc:mysql://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true' >> ~/.bashrc
+            echo 'SPRING_DATASOURCE_USERNAME=root' >> ~/.bashrc
+            echo 'SPRING_DATASOURCE_PASSWORD=ktbgroom' >> ~/.bashrc
+            echo 'AI_SERVER_URL=http://35.216.2.205' >> ~/.bashrc
+            source ~/.bashrc
+
             # 백엔드 실행
             ./gradlew build
             nohup java -jar build/libs/*.jar > backend.log 2>&1 &

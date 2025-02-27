@@ -1,6 +1,8 @@
 package com.example.writeagain_be.Controller;
 
+import com.example.writeagain_be.DTO.AIRequest;
 import com.example.writeagain_be.DTO.UserRequest;
+import com.example.writeagain_be.Service.AIService;
 import com.example.writeagain_be.Service.BlogService;
 import com.example.writeagain_be.Service.UserService;
 import com.example.writeagain_be.domain.BlogPost;
@@ -18,7 +20,7 @@ public class UserController {
     // 블로그 사이트 선택 & 닉네임 입력(사용자 정보 저장)
     @Autowired private UserService userService;
     @Autowired private BlogService blogService;
-    // @Autowired private AIService aiService;
+    @Autowired private AIService aiService;
     @PostMapping("/users/{userId}/information")
     public ResponseEntity<User> registerUser(@PathVariable Long userId, @RequestBody UserRequest request) {
         User user = userService.saveUser(userId, request);
@@ -37,13 +39,16 @@ public class UserController {
     public ResponseEntity<String> sendBlogDataToAI(@PathVariable Long userId) {
         String response = aiService.sendRecentBlogsToAI(userId);
         return ResponseEntity.ok(response);
-    }
+    }*/
     //프론트에서 제목 & 메모 데이터를 받아 AI 서버로 전달
-    @GetMapping("/users/{userId}/articles")
-    public ResponseEntity<String> sendUserInputToAI(@PathVariable Long userId, @RequestParam String title, @RequestParam String memo) {
-        String response = aiService.sendUserInputToAI(userId, title, memo);
-        return ResponseEntity.ok(response);
-    }
+    @PostMapping("/{userId}/articles")
+    public ResponseEntity<String> generateBlogPost(
+            @PathVariable Long userId,
+            @RequestBody AIRequest aiRequest
+    ) {
+        String generatedArticle = aiService.sendToAI(userId, aiRequest);  // userId 제거
+        return ResponseEntity.ok(generatedArticle);
+    }/*
     //AI 서버에서 생성된 블로그 글 받아서 프론트로 반환
     @GetMapping("/users/{userId}/articles")
     public ResponseEntity<String> getAIGeneratedArticle(@PathVariable Long userId) {

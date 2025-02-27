@@ -33,6 +33,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.rometools:rome:1.18.0'
     implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

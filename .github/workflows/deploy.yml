@@ -28,22 +28,27 @@ jobs:
             cd BE-Server || git clone https://github.com/WriteAgain/BE-Server.git && cd BE-Server
             git pull origin main
             
-            # Java 21 설치
-            sudo apt update
-            sudo apt install -y openjdk-21-jdk
-            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-            export PATH=\$JAVA_HOME/bin:\$PATH
-            echo 'export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64' >> ~/.bashrc
+            # Java 21 설치 (wget으로 직접 다운로드)
+            wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+            sudo dpkg -i jdk-21_linux-x64_bin.deb
+            echo 'export JAVA_HOME=/usr/lib/jvm/jdk-21' >> ~/.bashrc
             echo 'export PATH=\$JAVA_HOME/bin:\$PATH' >> ~/.bashrc
             source ~/.bashrc
-            
+            java -version || echo 'Java 설치 실패'
+
             # Gradle 실행 권한 추가
             chmod +x ./gradlew
 
-            # MySQL 8.4.4 ARM 버전 설치 및 설정
+            # MySQL 8 설치 (wget으로 직접 다운로드)
+            wget https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
+            sudo dpkg -i mysql-apt-config_0.8.22-1_all.deb
+            sudo apt update
             sudo apt install -y mysql-server
             sudo systemctl start mysql
             sudo systemctl enable mysql
+            sudo systemctl status mysql || echo ' MySQL 설치 실패'
+
+            # 데이터베이스 및 테이블 생성
             mysql -u root -e 'CREATE DATABASE IF NOT EXISTS writeagain;'
             mysql -u root -e \"CREATE TABLE IF NOT EXISTS writeagain.users (
               id INT AUTO_INCREMENT PRIMARY KEY,

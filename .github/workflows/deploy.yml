@@ -23,7 +23,7 @@ jobs:
 
       - name: Deploy to Compute Engine
         run: |
-          gcloud compute ssh was --zone=asia-northeast3-a --command="
+          gcloud compute ssh instance-20250227-030817 --zone=asia-northeast3-a --command="
             # 백엔드 폴더 이동 또는 클론
             cd BE-Server || git clone https://github.com/WriteAgain/BE-Server.git && cd BE-Server
             git pull origin main

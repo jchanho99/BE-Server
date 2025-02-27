@@ -35,11 +35,13 @@ public class UserController {
         return ResponseEntity.ok(blogs);
     }
     //최신 블로그 글 데이터 AI 서버로 전달
-    /*@PostMapping("/users/{userId}/articles")
+    @PostMapping("/{userId}/users/articles")
     public ResponseEntity<String> sendBlogDataToAI(@PathVariable Long userId) {
-        String response = aiService.sendRecentBlogsToAI(userId);
+        List<BlogPost> blogs = blogService.fetchRecentPosts(userId); // 최신 블로그 데이터 가져오기
+        String response = aiService.sendBlogDataToAI(userId, blogs); // AI 서버로 데이터 전달
         return ResponseEntity.ok(response);
-    }*/
+    }
+
     //프론트에서 제목 & 메모 데이터를 받아 AI 서버로 전달
     @PostMapping("/{userId}/articles")
     public ResponseEntity<String> generateBlogPost(
@@ -48,13 +50,5 @@ public class UserController {
     ) {
         String generatedArticle = aiService.sendToAI(userId, aiRequest);  // userId 제거
         return ResponseEntity.ok(generatedArticle);
-    }/*
-    //AI 서버에서 생성된 블로그 글 받아서 프론트로 반환
-    @GetMapping("/users/{userId}/articles")
-    public ResponseEntity<String> getAIGeneratedArticle(@PathVariable Long userId) {
-        String aiGeneratedArticle = aiService.getGeneratedArticle(userId);
-        return ResponseEntity.ok(aiGeneratedArticle);
     }
-
-     */
 }

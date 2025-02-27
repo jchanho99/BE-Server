@@ -24,7 +24,27 @@ jobs:
       - name: Deploy to Compute Engine
         run: |
           gcloud compute ssh instance-20250227-030817 --zone=asia-northeast3-a --command="
+            # 백엔드 폴더 이동 또는 클론
             cd BE-Server || git clone https://github.com/WriteAgain/BE-Server.git && cd BE-Server
             git pull origin main
-            ./gradlew bootRun  # Backend 실행 명령어
+            
+            # Java 설치 (버전 21)
+            sudo apt update
+            sudo apt install -y openjdk-21-jdk
+            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+            export PATH=\$JAVA_HOME/bin:\$PATH
+            echo 'export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64' >> ~/.bashrc
+            echo 'export PATH=\$JAVA_HOME/bin:\$PATH' >> ~/.bashrc
+            source ~/.bashrc
+            
+            # Gradle 실행 권한 추가
+            chmod +x ./gradlew
+            
+            # MySQL 확인 및 설정
+            sudo systemctl start mysql
+            mysql -u root -e 'CREATE DATABASE IF NOT EXISTS writeagain;'
+            
+            # 백엔드 실행
+            ./gradlew build
+            nohup java -jar build/libs/*.jar > backend.log 2>&1 &
           "

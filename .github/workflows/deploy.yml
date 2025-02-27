@@ -41,35 +41,32 @@ jobs:
             # Gradle 실행 권한 추가
             chmod +x ./gradlew
 
-            # MySQL 8 다운로드 및 수동 설치
-            wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.36-linux-glibc2.28-x86_64.tar.xz
-            tar -xvf mysql-8.0.36-linux-glibc2.28-x86_64.tar.xz
-            sudo mv mysql-8.0.36-linux-glibc2.28-x86_64 /usr/local/mysql
-            sudo ln -s /usr/local/mysql/bin/* /usr/bin/
-
-            # MySQL 데이터 디렉토리 설정 및 초기화
-            sudo mkdir -p /usr/local/mysql/data
-            sudo /usr/local/mysql/bin/mysqld --initialize --user=mysql || echo ' MySQL 초기화 실패'
-            sudo /usr/local/mysql/bin/mysqld_safe --user=mysql &
-
-            # MySQL root 사용자 설정 및 데이터베이스 초기화
-            sleep 5  # MySQL이 실행될 시간을 줌
-            sudo /usr/local/mysql/bin/mysqladmin -u root password 'ktbgroom' || echo ' MySQL root 비밀번호 설정 실패'
+                        # MariaDB 설치
+            sudo apt update
+            sudo apt install -y mariadb-server mariadb-client
             
-            # 데이터베이스 및 테이블 생성
-            sudo /usr/local/mysql/bin/mysql -u root -p'ktbgroom' -e 'CREATE DATABASE IF NOT EXISTS writeagain;' || echo ' MySQL 데이터베이스 생성 실패'
-            sudo /usr/local/mysql/bin/mysql -u root -p'ktbgroom' -e \"CREATE TABLE IF NOT EXISTS writeagain.users (
+            # MariaDB 서비스 시작 및 자동 실행 설정
+            sudo systemctl start mariadb
+            sudo systemctl enable mariadb
+            
+            # root 계정 비밀번호 설정 및 데이터베이스 생성
+            sudo mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'ktbgroom';"
+            sudo mariadb -u root -p'ktbgroom' -e "CREATE DATABASE IF NOT EXISTS writeagain;"
+            
+            # 테이블 생성
+            sudo mariadb -u root -p'ktbgroom' -e "USE writeagain; CREATE TABLE IF NOT EXISTS users (
               id INT AUTO_INCREMENT PRIMARY KEY,
               username VARCHAR(255) NOT NULL UNIQUE,
               blog_type ENUM('velog', 'github', 'blog', 'tistory') NOT NULL
-            );\" || echo ' MySQL 테이블 생성 실패'
+            );"
 
-            # 환경 변수 설정
-            echo 'export SPRING_DATASOURCE_URL=jdbc:mysql://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true' >> ~/.bashrc
+            # 환경 변수 설정 (MariaDB용 URL로 변경)
+            echo 'export SPRING_DATASOURCE_URL=jdbc:mariadb://34.64.248.152:3306/writeagain?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false' >> ~/.bashrc
             echo 'export SPRING_DATASOURCE_USERNAME=root' >> ~/.bashrc
             echo 'export SPRING_DATASOURCE_PASSWORD=ktbgroom' >> ~/.bashrc
             echo 'export AI_SERVER_URL=http://35.216.2.205' >> ~/.bashrc
             source ~/.bashrc
+
 
             # 백엔드 실행
             ./gradlew build
